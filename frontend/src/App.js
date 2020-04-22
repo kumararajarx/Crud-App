@@ -33,7 +33,7 @@ import axios from "axios";
       constructor(props) {
         super(props);
         this.state = {
-          modal: false,
+          // modal: false,
           viewCompleted: false,
           activeItem: {
             storeName: "",
@@ -54,28 +54,28 @@ import axios from "axios";
           .then(res => this.setState ({ crudList: res.data }))
           .catch(err => console.log(err));
       }
-      toggle = () => {
-        this.setState({ modal: !this.state.modal });
-      }
+      // toggle = () => {
+      //   this.setState({ modal: !this.state.modal });
+      // }
 
-        handleSubmit = item => {
-          this.toggle();
-          alert("save" + JSON.stringify(item));
-        }
+      //   handleSubmit = item => {
+      //     this.toggle();
+      //     alert("save" + JSON.stringify(item));
+      //   }
 
-      handleDelete = item => {
-        this.toggle();
-        alert("delete" + JSON.stringify(item));
-      }
+      // handleDelete = item => {
+      //   this.toggle();
+      //   alert("delete" + JSON.stringify(item));
+      // }
 
-        createItem = () => {
-          const item = { storeName: "", desc:"", status:false };
-          this.setState({ activeItem: item, modal: !this.state.modal });
-        }
+      //   createItem = () => {
+      //     const item = { storeName: "", desc:"", status:false };
+      //     this.setState({ activeItem: item, modal: !this.state.modal });
+      //   }
 
-        editItem = item => {
-          this.setState({ activeItem: item, modal: !this.state.modal });
-        }
+      //   editItem = item => {
+      //     this.setState({ activeItem: item, modal: !this.state.modal });
+      //   }
       displayCompleted = stat => {
         if (stat) {
           return this.setState({ viewCompleted: true });
@@ -103,7 +103,7 @@ import axios from "axios";
       renderItems = () => {
         const { viewCompleted } = this.state;
         const newItems = this.state.crudList.filter(
-          item => item.status == viewCompleted
+          item => item.status === viewCompleted
         );
         return newItems.map(item => (
           <li
@@ -119,11 +119,38 @@ import axios from "axios";
               {item.storeName}
             </span>
             <span>
-              <button className="btn btn-secondary mr-2" onClick={() => this.editItem(item)}> Edit </button>
-              <button className="btn btn-danger" onClick={() => this.handleDelete(item)}>Delete </button>
+            <button onClick={() => this.editItem(item)} className="btn btn-secondary mr-2" > {" "}Edit {" "} </button>
+              <button onClick={() => this.handleDelete(item)} className="btn btn-danger"> Delete {" "} </button>
             </span>
           </li>
         ));
+      };
+      toggle = () => {
+        this.setState({ modal: !this.state.modal});
+      };
+      handleSubmit = item => {
+        this.toggle();
+        if (item.id) {
+          axios
+          .put('http://localhost:800/api/cruds/${item.id}/', item)
+          .then(res => this.refreshList());
+          return;
+        }
+        axios
+        .post("http://localhost:800/api/cruds/", item)
+        .then(res => this.refreshList());
+      };
+      handleDelete = item => {
+        axios
+          .delete(`http://localhost:8000/api/cruds/${item.id}`)
+          .then(res => this.refreshList());
+      };
+      createItem = () => {
+        const item = { storeName: "", desc: "", status: false };
+        this.setState({ activeItem: item, modal: !this.state.modal });
+      };
+      editItem = item => {
+        this.setState({ activeItem: item, modal: !this.state.modal });
       };
       render() {
         return (
